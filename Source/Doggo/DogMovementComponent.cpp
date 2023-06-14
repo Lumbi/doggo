@@ -2,6 +2,7 @@
 
 
 #include "DogMovementComponent.h"
+#include "StaminaComponent.h"
 
 void UDogMovementComponent::InitializeComponent()
 {
@@ -31,6 +32,12 @@ void UDogMovementComponent::JumpTo(const FVector& TargetLocation)
 	}
 
 	UpdateComponentVelocity();
+}
+
+UStaminaComponent* UDogMovementComponent::GetStaminaComponent()
+{
+	if (!PawnOwner) { return nullptr; }
+	return PawnOwner->GetComponentByClass<UStaminaComponent>();
 }
 
 bool UDogMovementComponent::IsGrounded() const
@@ -71,7 +78,7 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	if (!PawnOwner || !UpdatedComponent) { return; }
 
-	// Update Velocity
+	// Walk / Idle State
 	if (IsGrounded()) {
 		// Apply Acceleration
 		FVector InputVector = ConsumeInputVector();
@@ -83,8 +90,23 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		// Clamp to max speed
 		Velocity = Velocity.GetClampedToMaxSize(GetMaxSpeed());
+
+		// Update stamina
+		{
+			UStaminaComponent* StaminaComponent = GetStaminaComponent();
+			if (StaminaComponent) {
+				if (!Velocity.IsNearlyZero())
+				{
+					StaminaComponent->ConsumeStamina(WalkStaminaConsumptionRate);
+				}
+				else {
+					StaminaComponent->RecoverStamina(IdleStaminaRecoveryRate);
+				}
+			}
+		}
 	}
 	
+	// Jumping / Falling State
 	if (!IsGrounded())
 	{
 		// Apply gravity

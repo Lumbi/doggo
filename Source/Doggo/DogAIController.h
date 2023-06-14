@@ -20,6 +20,6 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	class UBehaviorTree* AIBehavior = nullptr;
 };

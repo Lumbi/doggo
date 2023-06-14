@@ -17,25 +17,34 @@ class DOGGO_API UDogMovementComponent : public UPawnMovementComponent
 
 	virtual float GetMaxSpeed() const override;
 
+	UFUNCTION(BlueprintPure)
+	bool IsGrounded() const;
+
 	UFUNCTION(BlueprintCallable)
 	void JumpTo(const FVector& TargetLocation);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DogMovement)
+	UPROPERTY(EditDefaultsOnly, Category = Walk)
 	float MaxSpeed = 400.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DogMovement)
+	UPROPERTY(EditDefaultsOnly, Category = Walk)
 	float SpeedAdjustRate = 5.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DogMovement)
+	UPROPERTY(EditDefaultsOnly, Category = Jump)
 	float JumpDuration = 1.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DogMovement)
+	UPROPERTY(EditDefaultsOnly, Category = Jump)
 	float JumpMargin = 100.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DogMovement)
+	UPROPERTY(EditDefaultsOnly, Category = Jump)
 	float JumpHopDownVerticalVelocity = 500.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = Stamina)
+	float WalkStaminaConsumptionRate = 200.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = Stamina)
+	float IdleStaminaRecoveryRate = 500.f;
+
 private:
-	bool IsGrounded() const;
+	class UStaminaComponent* GetStaminaComponent();
 };
