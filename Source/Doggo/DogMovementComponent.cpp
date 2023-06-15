@@ -34,7 +34,17 @@ void UDogMovementComponent::JumpTo(const FVector& TargetLocation)
 	UpdateComponentVelocity();
 }
 
-UStaminaComponent* UDogMovementComponent::GetStaminaComponent()
+void UDogMovementComponent::StartResting()
+{
+	bIsResting = true;
+}
+
+void UDogMovementComponent::StopResting()
+{
+	bIsResting = false;
+}
+
+UStaminaComponent* UDogMovementComponent::GetStaminaComponent() const
 {
 	if (!PawnOwner) { return nullptr; }
 	return PawnOwner->GetComponentByClass<UStaminaComponent>();
@@ -70,6 +80,11 @@ bool UDogMovementComponent::IsGrounded() const
 	return bDidHitGround && !bHasUpwardVelocity;
 }
 
+bool UDogMovementComponent::IsResting() const
+{
+	return bIsResting;
+}
+
 void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	if (ShouldSkipUpdate(DeltaTime)) { return; }
@@ -77,6 +92,8 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (!PawnOwner || !UpdatedComponent) { return; }
+
+	UStaminaComponent* StaminaComponent = GetStaminaComponent();
 
 	// Walk / Idle State
 	if (IsGrounded()) {
@@ -93,9 +110,8 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		// Update stamina
 		{
-			UStaminaComponent* StaminaComponent = GetStaminaComponent();
 			if (StaminaComponent) {
-				if (!Velocity.IsNearlyZero())
+				if (!Velocity.IsNearlyZero(50.f))
 				{
 					StaminaComponent->ConsumeStamina(WalkStaminaConsumptionRate);
 				}
@@ -111,6 +127,14 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		// Apply gravity
 		Velocity.Z += GetGravityZ() * DeltaTime;
+	}
+
+	// Stop resting if moving and stamina is full
+	if (IsResting()) {
+		if (!Velocity.IsNearlyZero() && StaminaComponent && StaminaComponent->GetStaminaRatio() >= 1.f)
+		{
+			StopResting();
+		}
 	}
 
 	// Apply Velocity

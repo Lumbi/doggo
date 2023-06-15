@@ -21,7 +21,16 @@ class DOGGO_API UDogMovementComponent : public UPawnMovementComponent
 	bool IsGrounded() const;
 
 	UFUNCTION(BlueprintCallable)
+	bool IsResting() const;
+
+	UFUNCTION(BlueprintCallable)
 	void JumpTo(const FVector& TargetLocation);
+
+	UFUNCTION(BlueprintCallable)
+	void StartResting();
+
+	UFUNCTION(BlueprintCallable)
+	void StopResting();
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = Walk)
@@ -49,5 +58,6 @@ public:
 	float IdleStaminaRecoveryRate = 500.f;
 
 private:
-	class UStaminaComponent* GetStaminaComponent();
+	class UStaminaComponent* GetStaminaComponent() const;
+	bool bIsResting = false;
 };
