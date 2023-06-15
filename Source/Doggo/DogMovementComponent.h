@@ -17,7 +17,7 @@ class DOGGO_API UDogMovementComponent : public UPawnMovementComponent
 
 	virtual float GetMaxSpeed() const override;
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintCallable)
 	bool IsGrounded() const;
 
 	UFUNCTION(BlueprintCallable)
@@ -29,6 +29,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Walk)
 	float SpeedAdjustRate = 5.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = Walk)
+	float RotationAdjustRate = 5.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = Jump)
 	float JumpDuration = 1.5f;

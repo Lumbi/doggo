@@ -136,10 +136,12 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	// Face movement direction
 	{
 
-		FVector FaceDirection = Velocity;
-		FaceDirection.Z = 0.f;
-		if (!FaceDirection.IsNearlyZero()) {
-			UpdatedComponent->SetWorldRotation(FaceDirection.ToOrientationRotator());
+		FVector TargetFaceDirection = Velocity;
+		TargetFaceDirection.Z = 0.f;
+		if (!TargetFaceDirection.IsNearlyZero()) {
+			FRotator TargetFaceRotation = TargetFaceDirection.ToOrientationRotator();
+			FRotator CurrentFaceRotation = UpdatedComponent->GetComponentRotation();
+			UpdatedComponent->SetWorldRotation(FMath::Lerp(CurrentFaceRotation, TargetFaceRotation, DeltaTime * RotationAdjustRate));
 		}
 	}
 
@@ -149,12 +151,12 @@ void UDogMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			GetWorld(),
 			PawnOwner->GetActorLocation(),
 			PawnOwner->GetActorLocation() + Velocity,
-			20.f,
+			10.f,
 			FColor::Red,
 			false,
 			-1.0f,
 			0,
-			10.0f
+			5.0f
 		);
 	}
 
